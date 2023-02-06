@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "api/*": ["../api/*"],
+      "web/*": ["../web/*"],
+      "types/*": ["../types/*", "../web/types/*", "../api/types/*"],
+    },
+    "typeRoots": ["../node_modules/@types"],
+    "jsx": "preserve",
+  },
+  "include": [
+    ".",
+    "../.redwood/types/includes/all-*",
+    "../.redwood/types/includes/web-*",
+    "../types"
+  ]
+}

@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  database:
+    image: supabase/postgres:14.1.0
+    environment:
+      # The following username+password combiniation will be for the database's root user.
+      # See "scripts/setup-db-user.ts" for a script which creates a non-root user for production use.
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
