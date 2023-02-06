@@ -73,3 +73,7 @@ yarn rw exec setup-db-user
 ## References
 
 * [Prisma Client Extension - Row Level Security](https://github.com/prisma/prisma-client-extensions/tree/main/examples/row-level-security#prisma-client-extension---row-level-security)
+
+## License
+
+This demonstration is licensed under [MIT](./LICENSE).
