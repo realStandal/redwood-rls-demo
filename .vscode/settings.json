@@ -17,5 +17,8 @@
     ".env.defaults": ".env*",
     "package.json": ".editorconfig, .gitignore, .nvmrc, .yarnrc.yml, docker-compose.yml, graphql.config.js, jest.config.js, prettier.config.js, redwood.toml, server.config.js, tsconfig.json, yarn.lock",
     "README.md": "LICENSE"
+  },
+  "material-icon-theme.folders.associations": {
+    "directives": "pipe"
   }
 }

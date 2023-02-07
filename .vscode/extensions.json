@@ -6,7 +6,8 @@
     "mgmcdermott.vscode-language-babel",
     "editorconfig.editorconfig",
     "prisma.prisma",
-    "graphql.vscode-graphql"
+    "graphql.vscode-graphql",
+    "pkief.material-icon-theme"
   ],
   "unwantedRecommendations": []
 }
