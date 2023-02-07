@@ -80,5 +80,6 @@ This example is licensed under [the MIT license](./LICENSE).
 
 ## References
 
-* [Documentation on Prisma Client Extensions](https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions)
+* [Documentation on Prisma Client extensions](https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions)
+* [Documentation on Raw database access](https://www.prisma.io/docs/concepts/components/prisma-client/raw-database-access)
 * [Prisma Client Extension - Row Level Security example](https://github.com/prisma/prisma-client-extensions/tree/main/examples/row-level-security#prisma-client-extension---row-level-security)
