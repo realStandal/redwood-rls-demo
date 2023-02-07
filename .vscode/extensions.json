@@ -7,7 +7,9 @@
     "editorconfig.editorconfig",
     "prisma.prisma",
     "graphql.vscode-graphql",
-    "pkief.material-icon-theme"
+    "pkief.material-icon-theme",
+    "csstools.postcss",
+    "bradlc.vscode-tailwindcss"
   ],
   "unwantedRecommendations": []
 }

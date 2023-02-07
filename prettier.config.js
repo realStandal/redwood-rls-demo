@@ -7,6 +7,8 @@ module.exports = {
   semi: false,
   singleQuote: true,
   arrowParens: 'always',
+  tailwindConfig: './web/config/tailwind.config.js',
+  plugins: [require('prettier-plugin-tailwindcss')],
   overrides: [
     {
       files: 'Routes.*',
