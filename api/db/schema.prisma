@@ -14,6 +14,7 @@ model Tenant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  posts Post[]
   users User[]
 }
 
@@ -30,6 +31,23 @@ model User {
   resetToken          String?
   resetTokenExpiresAt DateTime?
 
+  posts Post[]
+
   tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId String @default(dbgenerated("(current_setting('app.current_tenant_id'::text))::uuid")) @db.Uuid
+  tenantId String @default(dbgenerated("(current_setting('app.tenantId'::text))::uuid")) @db.Uuid
+}
+
+model Post {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String
+  body  String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @default(dbgenerated("(current_setting('app.userId'::text))::uuid")) @db.Uuid
+
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId String @default(dbgenerated("(current_setting('app.tenantId'::text))::uuid")) @db.Uuid
 }
