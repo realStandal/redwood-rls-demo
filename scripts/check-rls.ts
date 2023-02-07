@@ -18,10 +18,24 @@ export default async () => {
 
   const currentUserName = currentUsers[0].user
 
+  if (typeof currentUserName !== 'string') {
+    console.log(
+      c.redBright('\nError determining which user was used to log in.\n')
+    )
+
+    process.exit(1)
+  }
+
   const currentRoles =
     await db.$queryRaw`SELECT rolname, rolsuper, rolbypassrls FROM pg_roles WHERE rolname = ${currentUserName}`
 
   const currentRole: CurrentRole = currentRoles[0]
+
+  if (typeof currentRole === 'undefined') {
+    console.log(c.redBright('\nError accessing the current user.\n'))
+
+    process.exit(1)
+  }
 
   switch (true) {
     case currentRole.rolbypassrls || currentRole.rolsuper: {
