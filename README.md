@@ -72,7 +72,7 @@ yarn rw exec setup-user
 
 ## License
 
-This example is licensed under the [MIT](./LICENSE) license.
+This example is licensed under [the MIT license](./LICENSE).
 
 ## References
 
