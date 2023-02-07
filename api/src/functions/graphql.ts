@@ -5,6 +5,7 @@ import directives from 'src/directives/**/*.{js,ts}'
 import sdls from 'src/graphql/**/*.sdl.{js,ts}'
 import services from 'src/services/**/*.{js,ts}'
 
+import { useDbAuthConfig } from 'src/extensions/config'
 import { getCurrentUser } from 'src/lib/auth'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
@@ -12,12 +13,12 @@ import { logger } from 'src/lib/logger'
 export const handler = createGraphQLHandler({
   authDecoder,
   getCurrentUser,
-  loggerConfig: { logger, options: {} },
   directives,
   sdls,
   services,
+  loggerConfig: { logger, options: {} },
+  extraPlugins: [useDbAuthConfig()],
   onException: () => {
-    // Disconnect from your database with an unhandled exception.
     db.$disconnect()
   },
 })
