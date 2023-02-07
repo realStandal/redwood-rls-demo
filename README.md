@@ -6,12 +6,12 @@
 
 This repository provides a demonstration of how to use [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). While this demonstration assumes a new project with a freshly installed/blank database, its patterns can be used in any project which needs RLS.
 
+* [Getting Started](#getting-started) with this repository.
+* [Supporting RLS](#supporting-rls) in a RedwoodJS application.
+
 ## Getting Started
 
-0) Install prerequisites.
-1) Clone the source code and install dependencies.
-2) Start your database. (optional)
-3) Create a database user with limited access.
+The following provides a set of steps for cloning and setting up this repository on your development machine. The next section, [Supporting RLS](#supporting-rls), details supporting row-level security from within a RedwoodJS application.
 
 ### 0) Prerequisites
 
@@ -56,7 +56,11 @@ DATABASE_URL=...
 TEST_DATABASE_URL=...
 ```
 
-### 3) Create a database user with limited access
+## Supporting RLS
+
+This section details supporting [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com).
+
+### 1) Create a user with limited access
 
 In order to use row-level security, a database needs to be connected to as a non-superuser which **does not** have the `BYPASSRLS` attribute. To check if the configured user will respect RLS policies, a [script](./scripts/check-rls.ts) has been added:
 
