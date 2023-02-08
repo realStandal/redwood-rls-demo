@@ -53,18 +53,17 @@ By default, the project is configured with the assumption you will be running a 
 
 ```dotenv
 DATABASE_URL=...
-TEST_DATABASE_URL=...
 ```
 
 ### 3) Migrate and seed your database
 
-Once your database has been successfully started and the application configured, apply all pending database migrations.
+Once your database has been started and the application configured, apply all pending database migrations.
 
 ```bash
 yarn rw prisma migrate dev
 ```
 
-After your database is migrated, [a seed script](https://github.com/realStandal/redwood-rls-demo/blob/main/scripts/seed.ts) has been added which you can use to populate the database for the purpose of demonstration.
+After your database has been migrated, your can seed it using [the provided script](https://github.com/realStandal/redwood-rls-demo/blob/main/scripts/seed.ts).
 
 ```bash
 yarn rw exec seed
@@ -84,13 +83,13 @@ yarn rw exec check-rls
 
 To simplify creating a user which respects RLS policies, a [script](./scripts/setup-user.ts) has been added. It will prompt you for a username, password, and whether or not there is an existing database this user should have access to. This script will use the database configured in `.env.defaults` or `.env` and **should** be ran by a superuser.
 
-> **Warning**
->
-> When accessing [Prisma Studio](https://www.prisma.io/studio) using a user which respects RLS policies, you may not have a complete view of your application's data. Consider using one which **does** bypass RLS rules, especially when you need to perform maintenance on your user's data.
-
 ```bash
 yarn rw exec setup-user
 ```
+
+> **Warning**
+>
+> When accessing [Prisma Studio](https://www.prisma.io/studio) using a user which respects RLS policies, you may not have a complete view of your application's data. Consider using one which **does** bypass RLS rules, especially when you need to perform maintenance on your user's data.
 
 ### 2) Extend the Prisma Client
 
