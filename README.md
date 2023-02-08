@@ -35,7 +35,7 @@ cd redwood-rls-demo
 yarn install
 ```
 
-### 2) Start your database (optional)
+### 2) Start your database
 
 If you haven't already, or if you're making use of this demonstration's [compose configuration](./docker-compose.yml), you'll need to start your Postgres database and configure the project to make use of its root user.
 
@@ -56,11 +56,25 @@ DATABASE_URL=...
 TEST_DATABASE_URL=...
 ```
 
+### 3) Migrate and seed your database
+
+Once your database has been successfully started and the application configured, apply all pending database migrations.
+
+```bash
+yarn rw prisma migrate dev
+```
+
+After your database is migrated, [a seed script](https://github.com/realStandal/redwood-rls-demo/blob/main/scripts/seed.ts) has been added which you can use to populate the database for the purpose of demonstration.
+
+```bash
+yarn rw exec seed
+```
+
 ## Supporting RLS
 
-This section details supporting [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com).
+This section details supporting [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). These steps have been applied to this repository and have been listed here to generalize them across applications.
 
-### 1) Create a user with limited access
+### 1) Create a user which respects RLS policies
 
 In order to use row-level security, a database needs to be connected to as a non-superuser which **does not** have the `BYPASSRLS` attribute. To check if the configured user will respect RLS policies, a [script](./scripts/check-rls.ts) has been added:
 
@@ -70,13 +84,33 @@ yarn rw exec check-rls
 
 To simplify creating a user which respects RLS policies, a [script](./scripts/setup-user.ts) has been added. It will prompt you for a username, password, and whether or not there is an existing database this user should have access to. This script will use the database configured in `.env.defaults` or `.env` and **should** be ran by a superuser.
 
+> **Warning**
+>
+> When accessing [Prisma Studio](https://www.prisma.io/studio) using a user which respects RLS policies, you may not have a complete view of your application's data. Consider using one which **does** bypass RLS rules, especially when you need to perform maintenance on your user's data.
+
 ```bash
 yarn rw exec setup-user
 ```
 
+### 2) Extend the Prisma Client
+
+[The Prisma Client supports extension](https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions) as a preview feature. This needs to be enabled in your application's Prisma Schema under the `generator client { ... }` block.
+
+```prisma
+generator client {
+  previewFeatures = ["clientExtensions"]
+}
+```
+
+After being enabled, we can add an extension to all queries, across all models, and for all operations on these models. This extension should [set a parameter on the current transaction](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET) which we can use to facilitate authorizing security policies and to defaults values in columns.
+
+### 3) Create a Yoga Plugin providing the extended Prisma Client
+
+### 4) Add RLS policies using a database migration
+
 ## License
 
-This example is licensed under [the MIT license](./LICENSE).
+This example is available under [the MIT license](./LICENSE).
 
 ## References
 
