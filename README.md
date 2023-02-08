@@ -16,9 +16,9 @@ The following provides a set of steps for cloning and setting up this repository
 ### 0) Prerequisites
 
 * See the [RedwoodJS prerequisites](https://redwoodjs.com/docs/quick-start)
-* Postgres Database
+* Postgres Database (one of)
   * [Docker](https://www.docker.com/products/docker-desktop/) - Used to run a short-lived Postgres container.
-  * [Local installation](https://redwoodjs.com/docs/local-postgres-setup) - A tutorial from the RedwoodJS documentation to install Postgres on your machine.
+  * [Local installation](https://redwoodjs.com/docs/local-postgres-setup) - A tutorial from the RedwoodJS documentation on installing Postgres to your local machine.
   * ... - Your preferred method of accessing a Postgres database while developing applications.
 
 ### 1) Get the code
