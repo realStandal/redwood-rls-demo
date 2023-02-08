@@ -41,7 +41,7 @@ If you haven't already, or if you're making use of this demonstration's [compose
 
 #### 2.1) Start the database container (Docker)
 
-If you're using Docker to provide a Postgres database, the following will start it using [Docker Compose](https://docs.docker.com/compose/).
+Start a Postgres database using [Docker Compose](https://docs.docker.com/compose/).
 
 ```bash
 docker compose up -d
