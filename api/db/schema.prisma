@@ -10,16 +10,18 @@ generator client {
 }
 
 model Tenant {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  name String @unique
 
   posts Post[]
   users User[]
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -34,11 +36,11 @@ model User {
   posts Post[]
 
   tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId String @default(dbgenerated("(current_setting('app.tenantId'::text))::uuid")) @db.Uuid
+  tenantId String @default(dbgenerated("(current_setting('app.tenantId'::text))::uuid"))
 }
 
 model Post {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -46,8 +48,8 @@ model Post {
   body  String
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @default(dbgenerated("(current_setting('app.userId'::text))::uuid")) @db.Uuid
+  userId String @default(dbgenerated("(current_setting('app.userId'::text))::uuid"))
 
   tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId String @default(dbgenerated("(current_setting('app.tenantId'::text))::uuid")) @db.Uuid
+  tenantId String @default(dbgenerated("(current_setting('app.tenantId'::text))::uuid"))
 }
