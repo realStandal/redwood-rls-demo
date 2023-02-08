@@ -4,7 +4,7 @@
   <br />
 </div>
 
-This repository provides a demonstration of how to use [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). While this demonstration assumes a new project with a freshly installed/blank database, its patterns can be used in any project which needs RLS.
+This repository provides a demonstration of how to use [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). While this demonstration assumes a new project with a blank database, its patterns can be used in any project which needs RLS.
 
 * [Getting Started](#getting-started) with this repository.
 * [Supporting RLS](#supporting-rls) in a RedwoodJS application.
