@@ -9,8 +9,6 @@ interface GetAuthDbArgs {
   userId?: string
 }
 
-const NIL_UUID = '00000000-0000-0000-0000-000000000000'
-
 /**
  * Bare-minimum {@link PrismaClient} with logging enabled.
  */
@@ -29,10 +27,7 @@ handlePrismaLogging({
  * @param userId The ID of the user to associate the client with.
  * @returns An extended {@link PrismaClient} which should be used to make request on behalf of the given user.
  */
-export const getAuthDb = ({
-  tenantId = NIL_UUID,
-  userId = NIL_UUID,
-}: GetAuthDbArgs) => {
+export const getAuthDb = ({ tenantId, userId }: GetAuthDbArgs) => {
   return db.$extends((client) => {
     return client.$extends({
       query: {
