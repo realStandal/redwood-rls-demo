@@ -133,7 +133,7 @@ export const getAuthDb = ({ tenantId, userId }) => {
 
 ### 3) Create a Yoga Plugin for the extended client
 
-We can provide the extended client to each service in our application by creating a [Yoga Plugin](https://the-guild.dev/graphql/yoga-server/docs/features/envelop-plugins) which extends RedwoodJS' context. If the user does not exist, or the application is being accessed anonymously, the original client will be added instead.
+We can provide the extended client to each service in our application by creating a [Yoga Plugin](https://the-guild.dev/graphql/yoga-server/docs/features/envelop-plugins) which extends RedwoodJS' context. If the user does not exist, or if the application is being accessed anonymously, the original client will be added instead.
 
 ```TypeScript
 import type { Plugin } from 'graphql-yoga'
