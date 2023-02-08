@@ -1,63 +1,137 @@
-import type { Prisma } from '@prisma/client'
-import { db } from 'api/src/lib/db'
+import { faker } from '@faker-js/faker'
+import { bypassDb, getAuthDb } from 'api/src/lib/db'
+
+import { hashPassword } from '@redwoodjs/auth-dbauth-api'
+
+const [hashedPassword, salt] = hashPassword('123')
 
 export default async () => {
   try {
-    //
-    // Manually seed via `yarn rw prisma db seed`
-    // Seeds automatically with `yarn rw prisma migrate dev` and `yarn rw prisma migrate reset`
-    //
-    // Update "const data = []" to match your data model and seeding needs
-    //
-    const data: Prisma.UserExampleCreateArgs['data'][] = [
-      // To try this example data with the UserExample model in schema.prisma,
-      // uncomment the lines below and run 'yarn rw prisma migrate dev'
-      //
-      // { name: 'alice', email: 'alice@example.com' },
-      // { name: 'mark', email: 'mark@example.com' },
-      // { name: 'jackie', email: 'jackie@example.com' },
-      // { name: 'bob', email: 'bob@example.com' },
-    ]
-    console.log(
-      "\nUsing the default './scripts/seed.{js,ts}' template\nEdit the file to add seed data\n"
-    )
+    const tenantA = await bypassDb.tenant.create({
+      data: {
+        name: 'ACME Corp.',
+      },
+    })
 
-    // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
-    // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
-    Promise.all(
-      //
-      // Change to match your data model and seeding needs
-      //
-      data.map(async (data: Prisma.UserExampleCreateArgs['data']) => {
-        const record = await db.userExample.create({ data })
-        console.log(record)
-      })
-    )
+    const tenantADb = getAuthDb({ tenantId: tenantA.id })
 
-    // If using dbAuth and seeding users, you'll need to add a `hashedPassword`
-    // and associated `salt` to their record. Here's how to create them using
-    // the same algorithm that dbAuth uses internally:
-    //
-    //   import { hashPassword } from '@redwoodjs/auth-dbauth-api'
-    //
-    //   const users = [
-    //     { name: 'john', email: 'john@example.com', password: 'secret1' },
-    //     { name: 'jane', email: 'jane@example.com', password: 'secret2' }
-    //   ]
-    //
-    //   for (user of users) {
-    //     const [hashedPassword, salt] = hashPassword(user.password)
-    //     await db.user.create({
-    //       data: {
-    //         name: user.name,
-    //         email: user.email,
-    //         hashedPassword,
-    //         salt
-    //       }
-    //     })
-    //   }
-  } catch (error) {
-    console.warn('Please define your seed data.')
-    console.error(error)
+    const [userA1, userA2] = await Promise.all([
+      tenantADb.user.create({
+        data: {
+          username: 'A1',
+          hashedPassword,
+          salt,
+        },
+      }),
+      tenantADb.user.create({
+        data: {
+          username: 'A2',
+          hashedPassword,
+          salt,
+        },
+      }),
+    ])
+
+    const userA1Db = getAuthDb({ tenantId: tenantA.id, userId: userA1.id })
+    const userA2Db = getAuthDb({ tenantId: tenantA.id, userId: userA2.id })
+
+    await Promise.all([
+      userA1Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+      userA1Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+      userA1Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+      userA1Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+      userA2Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+    ])
+
+    // --
+
+    const tenantB = await bypassDb.tenant.create({
+      data: {
+        name: 'ABC Inc.',
+      },
+    })
+
+    const tenantBDb = getAuthDb({ tenantId: tenantB.id })
+
+    const [userB1, userB2] = await Promise.all([
+      tenantBDb.user.create({
+        data: {
+          username: 'B1',
+          hashedPassword,
+          salt,
+        },
+      }),
+      tenantBDb.user.create({
+        data: {
+          username: 'B2',
+          hashedPassword,
+          salt,
+        },
+      }),
+    ])
+
+    const userB1Db = getAuthDb({ tenantId: tenantB.id, userId: userB1.id })
+    const userB2Db = getAuthDb({ tenantId: tenantB.id, userId: userB2.id })
+
+    await Promise.all([
+      userB1Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+      userB1Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+      userB1Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+      userB2Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+      userB2Db.post.create({
+        data: {
+          body: faker.lorem.paragraph(),
+          title: faker.vehicle.vehicle(),
+        },
+      }),
+    ])
+  } catch (err) {
+    console.log(err)
+    process.exit(1)
   }
 }

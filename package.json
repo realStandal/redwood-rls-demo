@@ -7,6 +7,7 @@
     ]
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@redwoodjs/auth-dbauth-setup": "4.0.1",
     "@redwoodjs/core": "4.0.1",
     "@types/prompts": "^2.4.2",
