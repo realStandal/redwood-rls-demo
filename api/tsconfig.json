@@ -7,6 +7,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "baseUrl": "./",
+    "types": ["jest"],
     "rootDirs": [
       "./src",
       "../.redwood/types/mirror/api/src"
@@ -23,12 +24,12 @@
       "../node_modules/@types",
       "./node_modules/@types"
     ],
-    "types": ["jest"],
   },
   "include": [
     "src",
+    "types/redwoodjs.d.ts",
     "../.redwood/types/includes/all-*",
     "../.redwood/types/includes/api-*",
-    "../types"
+    "../types",
   ]
 }

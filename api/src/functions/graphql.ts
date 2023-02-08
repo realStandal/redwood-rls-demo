@@ -5,10 +5,10 @@ import directives from 'src/directives/**/*.{js,ts}'
 import sdls from 'src/graphql/**/*.sdl.{js,ts}'
 import services from 'src/services/**/*.{js,ts}'
 
-import { useDbAuthConfig } from 'src/extensions/config'
 import { getCurrentUser } from 'src/lib/auth'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { usePrismaAuth } from 'src/plugins/prisma-auth'
 
 export const handler = createGraphQLHandler({
   authDecoder,
@@ -17,7 +17,7 @@ export const handler = createGraphQLHandler({
   sdls,
   services,
   loggerConfig: { logger, options: {} },
-  extraPlugins: [useDbAuthConfig()],
+  extraPlugins: [usePrismaAuth()],
   onException: () => {
     db.$disconnect()
   },
