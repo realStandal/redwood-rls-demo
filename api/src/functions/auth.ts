@@ -1,13 +1,12 @@
+import type { PrismaClient } from '@prisma/client'
 import type { APIGatewayProxyEvent, Context } from 'aws-lambda'
 
-import { DbAuthHandler, DbAuthHandlerOptions } from '@redwoodjs/auth-dbauth-api'
+import { DbAuthHandler } from '@redwoodjs/auth-dbauth-api'
+import type { DbAuthHandlerOptions } from '@redwoodjs/auth-dbauth-api'
 
-import { db } from 'src/lib/db'
+import { bypassDb } from 'src/lib/db'
 
-export const handler = async (
-  event: APIGatewayProxyEvent,
-  context: Context
-) => {
+export const handler = (event: APIGatewayProxyEvent, context: Context) => {
   const forgotPasswordOptions: DbAuthHandlerOptions['forgotPassword'] = {
     handler: (user) => user,
 
@@ -45,12 +44,12 @@ export const handler = async (
   }
 
   const signupOptions: DbAuthHandlerOptions['signup'] = {
-    handler: ({ username, hashedPassword, salt, userAttributes }) => {
-      return db.user.create({
+    handler: async ({ username, hashedPassword, salt }) => {
+      return bypassDb.user.create({
         data: {
-          username,
           hashedPassword,
           salt,
+          username,
         },
       })
     },
@@ -67,7 +66,7 @@ export const handler = async (
   }
 
   const authHandler = new DbAuthHandler(event, context, {
-    db: db,
+    db: bypassDb as PrismaClient,
 
     authModelAccessor: 'user',
 
@@ -87,8 +86,6 @@ export const handler = async (
       SameSite: 'Strict',
       Secure: process.env.NODE_ENV !== 'development',
 
-      // If you need to allow other domains (besides the api side) access to
-      // the dbAuth session cookie:
       // Domain: 'example.com',
     },
 
@@ -98,5 +95,5 @@ export const handler = async (
     signup: signupOptions,
   })
 
-  return await authHandler.invoke()
+  return authHandler.invoke()
 }
