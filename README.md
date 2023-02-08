@@ -37,7 +37,7 @@ yarn install
 
 ### 2) Start your database
 
-If you haven't already, or if you're making use of this demonstration's [compose configuration](./docker-compose.yml), you'll need to start your Postgres database and configure the project to make use of its root user.
+If you haven't already, or if you're making use of this demonstration's [compose configuration](./docker-compose.yml), you'll need to start your Postgres database.
 
 #### 2.1) Start the database container (Docker)
 
