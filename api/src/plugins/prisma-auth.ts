@@ -11,7 +11,7 @@ export const usePrismaAuth = (): Plugin<GlobalContext> => {
   return {
     onContextBuilding: ({ context, extendContext }) => {
       extendContext({
-        prisma: !context.currentUser
+        db: !context.currentUser
           ? db
           : getAuthDb({
               tenantId: context?.currentUser?.tenantId,
