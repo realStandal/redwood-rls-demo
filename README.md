@@ -4,7 +4,7 @@
   <br />
 </div>
 
-This repository provides a demonstration of how to use [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). While this demonstration assumes a new project with a freshly installed/blank database, its patterns can be used in any project which needs RLS.
+This repository provides a demonstration of how to use [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). While this demonstration assumes a new project with a blank database, its patterns can be used in any project which needs RLS.
 
 * [Getting Started](#getting-started) with this repository.
 * [Supporting RLS](#supporting-rls) in a RedwoodJS application.
@@ -37,11 +37,11 @@ yarn install
 
 ### 2) Start your database
 
-If you haven't already, or if you're making use of this demonstration's [compose configuration](./docker-compose.yml), you'll need to start your Postgres database and configure the project to make use of its root user.
+If you haven't already, or if you're making use of this demonstration's [compose configuration](./docker-compose.yml), you'll need to start your Postgres database.
 
 #### 2.1) Start the database container (Docker)
 
-If you're using Docker to provide a Postgres database, the following will start it using [Docker Compose](https://docs.docker.com/compose/).
+Start a Postgres database using [Docker Compose](https://docs.docker.com/compose/).
 
 ```bash
 docker compose up -d
@@ -89,11 +89,11 @@ yarn rw exec setup-user
 
 > **Warning**
 >
-> When accessing [Prisma Studio](https://www.prisma.io/studio) using a user which respects RLS policies, you may not have a complete view of your application's data. Consider using one which **does** bypass RLS rules, especially when you need to perform maintenance on your user's data.
+> When accessing [Prisma Studio](https://www.prisma.io/studio) using a user which respects RLS policies, you may not have a complete view of your application's data.
 
 ### 2) Extend the Prisma Client
 
-[The Prisma Client supports extension](https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions) as a preview feature. This needs to be enabled in your application's Prisma Schema under the `generator client { ... }` block.
+In order to [extend the Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions), extensions need to be enabled as a preview feature.
 
 ```prisma
 generator client {
@@ -101,11 +101,79 @@ generator client {
 }
 ```
 
-After being enabled, we can add an extension to all queries, across all models, and for all operations on these models. This extension should [set a parameter on the current transaction](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET) which we can use to facilitate authorizing security policies and to defaults values in columns.
+After being enabled, an extension can be added to all queries, across all models, and for all operations on these models. This extension should [set a parameter on the current transaction](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET) which we can use to authorize security policies and as the default value of columns. This is really useful for associating a set of requests with a particular user of the application. The following [has been taken from this repository](https://github.com/realStandal/redwood-rls-demo/blob/7f4da2c7a4d2eb3dd53574b78e0125a3ca0e8c1a/api/src/lib/db.ts#L25) and demonstrates associating queries with two distinct values.
 
-### 3) Create a Yoga Plugin providing the extended Prisma Client
+```TypeScript
+import { PrismaClient } from '@prisma/client'
+
+export const db = new PrismaClient()
+
+export const getAuthDb = ({ tenantId, userId }) => {
+  return db.$extends((client) => {
+    return client.$extends({
+      query: {
+        $allModels: {
+          async $allOperations({ args, query }) {
+            const [, , result] = await client.$transaction([
+              client.$executeRaw`SELECT set_config('app.tenantId', ${tenantId}, TRUE)`,
+              client.$executeRaw`SELECT set_config('app.userId', ${userId}, TRUE)`,
+              query(args),
+            ])
+
+            return result
+          },
+        },
+      },
+    })
+  })
+}
+```
+
+(bypass extension)
+
+### 3) Create a Yoga Plugin for the extended client
+
+We can provide the extended client to each service in our application by creating a [Yoga Plugin](https://the-guild.dev/graphql/yoga-server/docs/features/envelop-plugins) which extends RedwoodJS' context. If the user does not exist, or if the application is being accessed anonymously, the original client will be added instead.
+
+```TypeScript
+import type { Plugin } from 'graphql-yoga'
+
+import type { GlobalContext } from '@redwoodjs/graphql-server'
+
+import { db, getAuthDb } from 'src/lib/db'
+
+export const usePrismaAuth = (): Plugin<GlobalContext> => {
+  return {
+    onContextBuilding: ({ context, extendContext }) => {
+      extendContext({
+        prisma: !context.currentUser
+          ? db
+          : getAuthDb({
+              tenantId: context?.currentUser?.tenantId,
+              userId: context?.currentUser?.id,
+            }),
+      })
+    },
+  }
+}
+
+```
+
+#### 3.1) Add the plugin to the application's GraphQL handler
+
+The plugin can be added to your application's GraphQL handler (`api/src/functions/graphql.{js|ts}`) using the `extraPlugins` field.
+
+```TypeScript
+import { usePrismaAuth } from 'src/plugins/prisma-auth'
+
+export const handler = createGraphQLHandler({
+  extraPlugins: [usePrismaAuth()],
+})
+```
 
 ### 4) Add RLS policies using a database migration
+
+
 
 ## License
 
