@@ -246,6 +246,10 @@ Once you've enabled RLS and have defined all security policies, the migration ca
 yarn rw prisma migrate dev
 ```
 
+### 5) Use the extended client in services
+
+...
+
 ## License
 
 This example is available under [the MIT license](./LICENSE).
