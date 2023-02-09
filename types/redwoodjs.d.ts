@@ -1,4 +1,4 @@
-import type { getAuthDb } from 'src/lib/db'
+import type { getAuthDb } from 'api/src/lib/db'
 
 declare module '@redwoodjs/graphql-server' {
   interface GlobalContext {
