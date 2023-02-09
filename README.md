@@ -57,8 +57,6 @@ DATABASE_URL=...
 
 ### 3) Migrate and seed your database
 
-Once your database is running and the application has been configured to connect to it, apply all of the example's migrations.
-
 ```bash
 yarn rw prisma migrate dev
 ```
