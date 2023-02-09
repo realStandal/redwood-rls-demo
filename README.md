@@ -47,6 +47,12 @@ A [compose configuration](./docker-compose.yml) has been provided which will sta
 docker compose up -d
 ```
 
+Once you are done using this database, it can be stopped using the following.
+
+```bash
+docker compose down
+```
+
 #### 2.2) Update the connection string (non-Docker)
 
 This demonstration has been setup with the assumption you will be running a database using the attached compose configuration. If you are not using it, you will need to create and configure an environment file (or update `.env.defaults`) with the updated connection string.
