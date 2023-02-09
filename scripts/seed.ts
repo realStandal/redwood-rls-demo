@@ -9,7 +9,7 @@ export default async () => {
   try {
     const tenantA = await bypassDb.tenant.create({
       data: {
-        name: 'ACME Corp.',
+        name: 'A',
       },
     })
 
@@ -72,7 +72,7 @@ export default async () => {
 
     const tenantB = await bypassDb.tenant.create({
       data: {
-        name: 'ABC Inc.',
+        name: 'B',
       },
     })
 
