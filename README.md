@@ -77,11 +77,11 @@ It will create numerous `Tenants`, `Users`, and `Posts` by these users. As defin
 
 * Password used by all users: `123`
 * Tenant `A`
-  * User `A1` with 4 post
+  * User `A1` with 4 posts
   * User `A2` with 1 post
 * Tenant `B`
-  * User `B1` with 3 post
-  * User `B2` with 2 post
+  * User `B1` with 3 posts
+  * User `B2` with 2 posts
 
 ### 4) Start the development server and login
 
