@@ -4,6 +4,10 @@
   <br />
 </div>
 
+> **Warning**
+>
+> Because this method wraps each request in a batch transaction, explicitly running a transaction using `db.$transaction()` may result in unexpected behavior. Prisma expects to change this in the future, and more information [can be found on the official RLS example from Prisma](https://github.com/prisma/prisma-client-extensions/tree/main/examples/row-level-security#caveats).
+
 This repository provides a demonstration of how to use [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). The README has been divided into two sections:
 
 * [Getting Started](#getting-started) with this repository.
