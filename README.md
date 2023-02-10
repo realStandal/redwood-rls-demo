@@ -73,7 +73,7 @@ After your database has been migrated, your can seed it using [the provided scri
 yarn rw exec seed
 ```
 
-It will create numerous `Tenants`, `Users`, and `Posts` by these users. As defined by the [migrated security policies](https://github.com/realStandal/redwood-rls-demo/blob/main/api/db/migrations/20230208064740_add_rls_policies/migration.sql): users will only be able to access posts created by users in the same tenant as them. In addition, posts can only be updated and deleted by the user who created the post. The list below provides a summary of the data which is added by the script.
+It will create numerous `Tenants`, `Users`, and `Posts` by these users. As defined by the [migrated security policies](https://github.com/realStandal/redwood-rls-demo/blob/main/api/db/migrations/20230208064740_add_rls_policies/migration.sql): users will only be able to access posts created by users in the same tenant as them. In addition, posts can only be updated and deleted by the user who created the post. The list below provides a summary of the data which will be added by the script.
 
 * Password used by all users: `123`
 * Tenant `A`
