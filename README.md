@@ -73,19 +73,19 @@ After your database has been migrated, your can seed it using [the provided scri
 yarn rw exec seed
 ```
 
-It will create numerous `Tenants`, `Users`, and `Posts` by these users. As defined by the [migrated security policies](https://github.com/realStandal/redwood-rls-demo/blob/main/api/db/migrations/20230208064740_add_rls_policies/migration.sql): users will only be able to access posts created by users in the same tenant as them. In addition, posts can only be updated and deleted by the user who created the post. The list below provides a summary of the data which is added by the script.
+It will create numerous `Tenants`, `Users`, and `Posts` by these users. As defined by the [migrated security policies](https://github.com/realStandal/redwood-rls-demo/blob/main/api/db/migrations/20230208064740_add_rls_policies/migration.sql): users will only be able to access posts created by users in the same tenant as them. In addition, posts can only be updated and deleted by the user who created the post. The list below provides a summary of the data which will be added by the script.
 
 * Password used by all users: `123`
 * Tenant `A`
-  * User `A1` with 4 post
+  * User `A1` with 4 posts
   * User `A2` with 1 post
 * Tenant `B`
-  * User `B1` with 3 post
-  * User `B2` with 2 post
+  * User `B1` with 3 posts
+  * User `B2` with 2 posts
 
 ### 4) Start the development server and login
 
-Start Redwood's development server, which should eventually open the `/login` page in a new browser window. Use one of the usernames listed in the previous section in combination with the password: `123` to login. After logging in, you should be navigated to the `/posts` page where only post by the selected user's tenant will be visible. Clicking the "Logout" button will allow you to login to another account - switching to a user in another tenant should  cause a new list of posts to appear.
+Start Redwood's development server, which should eventually open the `/login` page in a new browser window. Use one of the usernames listed in the previous section with the password: `123` to login. After logging in, you should be navigated to the `/posts` page where only posts by the selected user's tenant will be visible. Clicking the "Logout" button will allow you to login to another account - switching to a user in another tenant should cause a new list of posts to appear.
 
 ```bash
 yarn rw dev
