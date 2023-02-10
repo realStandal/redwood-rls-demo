@@ -4,21 +4,21 @@
   <br />
 </div>
 
-This repository provides a demonstration of how to use [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). While this demonstration assumes a new project with a blank database, its patterns can be used in any project which needs RLS.
+This repository provides a demonstration of how to use [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). The README has been divided into two sections:
 
 * [Getting Started](#getting-started) with this repository.
 * [Supporting RLS](#supporting-rls) in a RedwoodJS application.
 
 ## Getting Started
 
-The following provides a set of steps for cloning and setting up this repository on your development machine. The next section, [Supporting RLS](#supporting-rls), details supporting row-level security from within a RedwoodJS application.
+The following provides steps to clone and setup this repository on your development machine.
 
 ### 0) Prerequisites
 
-* See the [RedwoodJS prerequisites](https://redwoodjs.com/docs/quick-start)
-* Postgres Database (one of)
+* See and fulfill the [RedwoodJS prerequisites](https://redwoodjs.com/docs/quick-start)
+* Postgres database (one of)
   * [Docker](https://www.docker.com/products/docker-desktop/) - Used to run a short-lived Postgres container.
-  * [Local installation](https://redwoodjs.com/docs/local-postgres-setup) - A tutorial from the RedwoodJS documentation on installing Postgres to your local machine.
+  * [Local installation](https://redwoodjs.com/docs/local-postgres-setup) - A tutorial from Redwood on installing Postgres to your machine.
   * ... - Your preferred method of accessing a Postgres database while developing applications.
 
 ### 1) Get the code
@@ -35,29 +35,33 @@ cd redwood-rls-demo
 yarn install
 ```
 
-### 2) Start your database
+### 2) Start or configure your database
 
-If you haven't already, or if you're making use of this demonstration's [compose configuration](./docker-compose.yml), you'll need to start your Postgres database.
+Start your Postgres database and (optionally) configure the application to make use of its root user.
 
 #### 2.1) Start the database container (Docker)
 
-Start a Postgres database using [Docker Compose](https://docs.docker.com/compose/).
+A [compose configuration](./docker-compose.yml) has been provided which will start and expose a Postgres container which can be connected to using the username `postgres` and password `secret`.
 
 ```bash
 docker compose up -d
 ```
 
+Once you are done using this database, it can be stopped using the following.
+
+```bash
+docker compose down
+```
+
 #### 2.2) Update the connection string (non-Docker)
 
-By default, the project is configured with the assumption you will be running a database using Docker. If you are **not using Docker**, you will need to create and configure a file named `.env` with an updated connection string.
+This demonstration has been setup with the assumption you will be running a database using the attached compose configuration. If you are not using it, you will need to create and configure an environment file (or update `.env.defaults`) with the updated connection string.
 
 ```dotenv
 DATABASE_URL=...
 ```
 
 ### 3) Migrate and seed your database
-
-Once your database has been started and the application configured, apply all pending database migrations.
 
 ```bash
 yarn rw prisma migrate dev
@@ -69,19 +73,29 @@ After your database has been migrated, your can seed it using [the provided scri
 yarn rw exec seed
 ```
 
+It will create numerous `Tenants`, `Users`, and `Posts` by these users. As defined by the [migrated security policies](https://github.com/realStandal/redwood-rls-demo/blob/main/api/db/migrations/20230208064740_add_rls_policies/migration.sql): users will only be able to access posts created by users in the same tenant as them. In addition, posts can only be updated and deleted by the user who created the post. The list below provides a summary of the data which is added by the script.
+
+* Password used by all users: `123`
+* Tenant `A`
+  * User `A1`
+  * User `A2`
+* Tenant `B`
+  * User `B1`
+  * User `B2`
+
 ## Supporting RLS
 
-This section details supporting [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). These steps have been applied to this repository and have been listed here to generalize them across applications.
+This section details supporting [Postgres row-level security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) from within [a RedwoodJS application](https://redwoodjs.com). These steps have been applied to this repository and are listed here to be generalized across applications.
 
 ### 1) Create a user which respects RLS policies
 
-In order to use row-level security, a database needs to be connected to as a non-superuser which **does not** have the `BYPASSRLS` attribute. To check if the configured user will respect RLS policies, a [script](./scripts/check-rls.ts) has been added:
+In order to use row-level security, a database needs to be connected to as a non root user which **does not** have the `BYPASSRLS` attribute. To check if the configured user will respect RLS policies, a [script](./scripts/check-rls.ts) has been included which prints the results to the console. This script can be copy-and-pasted into your application for easy reuse.
 
 ```bash
 yarn rw exec check-rls
 ```
 
-To simplify creating a user which respects RLS policies, a [script](./scripts/setup-user.ts) has been added. It will prompt you for a username, password, and whether or not there is an existing database this user should have access to. This script will use the database configured in `.env.defaults` or `.env` and **should** be ran by a superuser.
+To simplify creating a user which respects RLS policies, another [script](./scripts/setup-user.ts) has been included which will prompt you for a username, password, and whether or not there is an existing database the user should have access to. This script will use the database configured in `.env.defaults` or `.env` and **should** be ran by a root user.
 
 ```bash
 yarn rw exec setup-user
@@ -91,9 +105,11 @@ yarn rw exec setup-user
 >
 > When accessing [Prisma Studio](https://www.prisma.io/studio) using a user which respects RLS policies, you may not have a complete view of your application's data.
 
+Your application can then connect to your database using this user to ensure data is accessed according to any security policies you have in place.
+
 ### 2) Extend the Prisma Client
 
-In order to [extend the Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions), extensions need to be enabled as a preview feature.
+In order to [extend a Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client/client-extensions), extensions need to be enabled as a preview feature in your database's schema.
 
 ```prisma
 generator client {
@@ -101,7 +117,7 @@ generator client {
 }
 ```
 
-After being enabled, an extension can be added to all queries, across all models, and for all operations on these models. This extension should [set a parameter on the current transaction](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET) which we can use to authorize security policies and as the default value of columns. This is really useful for associating a set of requests with a particular user of the application. The following [has been taken from this repository](https://github.com/realStandal/redwood-rls-demo/blob/7f4da2c7a4d2eb3dd53574b78e0125a3ca0e8c1a/api/src/lib/db.ts#L25) and demonstrates associating queries with two distinct values.
+After being enabled, we can extend all operations to include [parameters on the current transaction](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET). We can then make use of this parameter in security policies and as the default value of columns inserted using the extended client. In particular, this is useful for associating operations on the database with the user who made the request. The following [has been taken from this repository](https://github.com/realStandal/redwood-rls-demo/blob/main/api/src/lib/db.ts#L23) and demonstrates associating queries with two distinct values.
 
 ```TypeScript
 import { PrismaClient } from '@prisma/client'
@@ -129,11 +145,32 @@ export const getAuthDb = ({ tenantId, userId }) => {
 }
 ```
 
-(bypass extension)
+#### 2.1) Bypass client
 
-### 3) Create a Yoga Plugin for the extended client
+It may also be useful to extend the Prisma Client in order to create a bypass client with security policies which allow for operations on the database outside the scope of a user. The following [has been taken from this repository](https://github.com/realStandal/redwood-rls-demo/blob/main/api/src/lib/db.ts#L50) and [is provided to Redwood's dbAuth](https://github.com/realStandal/redwood-rls-demo/blob/7f4da2c7a4d2eb3dd53574b78e0125a3ca0e8c1a/api/src/functions/auth.ts#L69) which it can use to update users.
 
-We can provide the extended client to each service in our application by creating a [Yoga Plugin](https://the-guild.dev/graphql/yoga-server/docs/features/envelop-plugins) which extends RedwoodJS' context. If the user does not exist, or if the application is being accessed anonymously, the original client will be added instead.
+```TypeScript
+export const bypassDb = db.$extends((client) => {
+  return client.$extends({
+    query: {
+      $allModels: {
+        async $allOperations({ args, query }) {
+          const [, result] = await client.$transaction([
+            client.$executeRaw`SELECT set_config('app.bypass', 'on', TRUE)`,
+            query(args),
+          ])
+
+          return result
+        },
+      },
+    },
+  })
+})
+```
+
+### 3) Provide to the extended client to services
+
+We can provide the extended client to all services by creating a [Yoga Plugin](https://the-guild.dev/graphql/yoga-server/docs/features/envelop-plugins) which includes a customized client in the context of each request. If the user does not exist, or if the application is being accessed anonymously, the original client will be added instead. Like the other code samples, this one [has been taken from this repository](https://github.com/realStandal/redwood-rls-demo/blob/main/api/src/plugins/prisma-auth.ts).
 
 ```TypeScript
 import type { Plugin } from 'graphql-yoga'
@@ -146,7 +183,7 @@ export const usePrismaAuth = (): Plugin<GlobalContext> => {
   return {
     onContextBuilding: ({ context, extendContext }) => {
       extendContext({
-        prisma: !context.currentUser
+        db: !context.currentUser
           ? db
           : getAuthDb({
               tenantId: context?.currentUser?.tenantId,
@@ -159,7 +196,7 @@ export const usePrismaAuth = (): Plugin<GlobalContext> => {
 
 ```
 
-#### 3.1) Add the plugin to the application's GraphQL handler
+#### 3.1) Implement the plugin
 
 The plugin can be added to your application's GraphQL handler (`api/src/functions/graphql.{js|ts}`) using the `extraPlugins` field.
 
@@ -171,9 +208,53 @@ export const handler = createGraphQLHandler({
 })
 ```
 
+#### 3.2) Add type declarations (optional)
+
+If your project is written in TypeScript - or if you get errors trying to access `context.db` - you can extend Redwood's `GlobalContext` interface to include proper types for the context's Prisma Client. The following [has been taken from this repository](https://github.com/realStandal/redwood-rls-demo/blob/main/types/redwoodjs.d.ts) and is added to a file in a `types` directory which you should add to the root of your project.
+
+```TypeScript
+import type { getAuthDb } from 'api/src/lib/db'
+
+declare module '@redwoodjs/graphql-server' {
+  interface GlobalContext {
+    db: ReturnType<typeof getAuthDb>
+  }
+}
+```
+
 ### 4) Add RLS policies using a database migration
 
+Because Prisma does not support expressing security policies using its schema, [RLS can be enabled](https://www.postgresql.org/docs/current/sql-altertable.html) and [`CREATE POLICY` commands](https://www.postgresql.org/docs/current/sql-createpolicy.html) can be added to an existing migration file. A new, blank migration can be created using the command below.
 
+```bash
+yarn rw prisma migrate dev --create-only
+```
+
+The following is a portion of [this repository's RLS migration](https://github.com/realStandal/redwood-rls-demo/blob/main/api/db/migrations/20230208064740_add_rls_policies/migration.sql) with explanations as to what each command is doing and why it's present.
+
+```SQL
+-- 1) Enable row-level security on the "Tenants" table.
+ALTER TABLE "Tenant" ENABLE ROW LEVEL SECURITY;
+
+-- 2) Ensure security policies apply to the table's owner (by default they do not).
+ALTER TABLE "Tenant" FORCE ROW LEVEL SECURITY;
+
+-- 3) Create a policy which ensures the `app.tenantId` transaction parameter is equal to the target row's `id` column.
+CREATE POLICY tenant ON "Tenant" USING ("id" = current_setting('app.tenantId', TRUE)::text);
+
+-- 4) Create a policy allowing access to the table if the `app.bypass` parameter is equal to `'on'`.
+CREATE POLICY tenant_bypass ON "Tenant" USING (current_setting('app.bypass', TRUE)::text = 'on');
+```
+
+Once you've enabled RLS and have defined all security policies, the migration can be applied to your database.
+
+```
+yarn rw prisma migrate dev
+```
+
+### 5) Use the extended client in services
+
+...
 
 ## License
 
