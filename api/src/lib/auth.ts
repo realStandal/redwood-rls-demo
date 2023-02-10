@@ -11,7 +11,7 @@ interface RequireAuthArgs {
 
 export const getCurrentUser = async (session: Decoded) => {
   if (!session || typeof session.id !== 'string')
-    throw new AuthenticationError('Invalid authentication session')
+    throw new AuthenticationError('Invalid session')
 
   return bypassDb.user.findUnique({ where: { id: session.id } })
 }
