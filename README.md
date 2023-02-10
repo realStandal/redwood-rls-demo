@@ -77,11 +77,19 @@ It will create numerous `Tenants`, `Users`, and `Posts` by these users. As defin
 
 * Password used by all users: `123`
 * Tenant `A`
-  * User `A1`
-  * User `A2`
+  * User `A1` with 4 post
+  * User `A2` with 1 post
 * Tenant `B`
-  * User `B1`
-  * User `B2`
+  * User `B1` with 3 post
+  * User `B2` with 2 post
+
+### 4) Start the development server and login
+
+Start Redwood's development server, which should eventually open the `/login` page in a new browser window. Use one of the usernames listed in the previous section in combination with the password: `123` to login. After logging in, you should be navigated to the `/posts` page where only post by the selected user's tenant will be visible. Clicking the "Logout" button will allow you to login to another account - switching to a user in another tenant should  cause a new list of posts to appear.
+
+```bash
+yarn rw dev
+```
 
 ## Supporting RLS
 
@@ -254,7 +262,11 @@ yarn rw prisma migrate dev
 
 ### 5) Use the extended client in services
 
-...
+```JavaScript
+export const posts = () => {
+  return context.db.post.findMany()
+}
+```
 
 ## License
 
