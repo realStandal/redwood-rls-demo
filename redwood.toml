@@ -1,5 +1,5 @@
 [web]
-  title = "Redwood App"
+  title = "Redwood RLS Demonstration"
   port = 8910
   apiUrl = "/.redwood/functions"
   includeEnvironmentVariables = []
@@ -7,3 +7,6 @@
   port = 8911
 [browser]
   open = true
+[generate]
+  stories = false
+  tests = false
