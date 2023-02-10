@@ -85,7 +85,7 @@ It will create numerous `Tenants`, `Users`, and `Posts` by these users. As defin
 
 ### 4) Start the development server and login
 
-Start Redwood's development server, which should eventually open the `/login` page in a new browser window. Use one of the usernames listed in the previous section in combination with the password: `123` to login. After logging in, you should be navigated to the `/posts` page where only post by the selected user's tenant will be visible. Clicking the "Logout" button will allow you to login to another account - switching to a user in another tenant should  cause a new list of posts to appear.
+Start Redwood's development server, which should eventually open the `/login` page in a new browser window. Use one of the usernames listed in the previous section with the password: `123` to login. After logging in, you should be navigated to the `/posts` page where only posts by the selected user's tenant will be visible. Clicking the "Logout" button will allow you to login to another account - switching to a user in another tenant should cause a new list of posts to appear.
 
 ```bash
 yarn rw dev
