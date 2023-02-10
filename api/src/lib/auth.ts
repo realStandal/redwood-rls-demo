@@ -1,7 +1,7 @@
 import type { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
-import { db } from 'src/lib/db'
+import { bypassDb } from 'src/lib/db'
 
 type AllowedRoles = string | string[] | undefined
 
@@ -13,7 +13,7 @@ export const getCurrentUser = async (session: Decoded) => {
   if (!session || typeof session.id !== 'string')
     throw new AuthenticationError('Invalid authentication session')
 
-  return db.user.findUnique({ where: { id: session.id } })
+  return bypassDb.user.findUnique({ where: { id: session.id } })
 }
 
 export const hasRole = (roles: AllowedRoles) => {
