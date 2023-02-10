@@ -262,9 +262,26 @@ yarn rw prisma migrate dev
 
 ### 5) Use the extended client in services
 
+Instead of importing the Prisma Client from `api/src/lib/db`, the client which is scoped to the request which invoked the service can be accessed as `context.db` - without the need to import from any files.
+
 ```JavaScript
 export const posts = () => {
   return context.db.post.findMany()
+}
+```
+
+#### 5.1) Use the bypass client
+
+Some services or areas of your application will require you to bypass your security policies. The example below [has been taken from this repository](https://github.com/realStandal/redwood-rls-demo/blob/main/api/src/lib/auth.ts#L12) and highlights how a user is initially selected from a database before the extended client is added to the request's context.
+
+```JavaScript
+import { bypassDb } from 'src/lib/db'
+
+export const getCurrentUser = async (session) => {
+  if (!session)
+    throw new AuthenticationError('Invalid session')
+
+  return bypassDb.user.findUnique({ where: { id: session.id } })
 }
 ```
 
